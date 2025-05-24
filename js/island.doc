@@ -1,0 +1,104 @@
+**Jazira-JS: Island Class Usage Guide**
+
+The `Island` class in Jazira-JS represents a modular activity zone in your app — a self-contained, reactive region with its own widgets, local state streams, and lifecycle. It provides a clean abstraction for composing and managing UI clusters.
+
+---
+
+### 🧱 Structure
+
+Each `Island` includes:
+
+* A **name** for identification
+* A **DOM root element** for rendering widgets
+* A list of **widgets**
+* A local **stream registry**
+* An internal **subscription tracker**
+
+---
+
+### ⚙️ Creating an Island
+
+```js
+const island = new Island('UserDashboard', document.getElementById('dashboard'));
+```
+
+---
+
+### 🧩 Adding Widgets
+
+```js
+island.addWidget(new MyWidget('widget1', island.rootElement));
+```
+
+This automatically calls `widget.attach(island)` if available.
+
+---
+
+### 🔄 Local Streams
+
+```js
+const userStream = island.createStream('userData', {});
+const sameStream = island.getStream('userData');
+```
+
+* Streams are namespaced and owned by the island.
+* You can use `.observe()` to subscribe safely:
+
+```js
+island.observe(userStream, function(value) {
+  this.renderUser(value);
+}, this); // Optional context
+```
+
+---
+
+### 🧬 Lifecycle Hooks
+
+#### `initialize()`
+
+Called once when the island is created and ready:
+
+```js
+island.initialize();
+```
+
+Calls `init()` on each widget.
+
+#### `activate()` / `deactivate()`
+
+Use these to trigger animations, data fetches, or lazy hydration:
+
+```js
+island.activate();
+// ...later
+island.deactivate();
+```
+
+Widgets receive `onActivate()` and `onDeactivate()` calls.
+
+#### `destroy()`
+
+Cleanly shuts down the island:
+
+```js
+island.destroy();
+```
+
+* Unsubscribes all listeners
+* Calls `destroy()` on each widget
+* Clears the DOM and internal state
+
+---
+
+### 🛠 Best Practices
+
+* Use `createStream()` instead of global state for modularity
+* Always call `destroy()` on island removal to prevent leaks
+* Use `observe()` for safe stream wiring and auto-cleanup
+* Pair `initialize()` with `activate()` for lazy UI hydration
+
+---
+
+### 📘 Summary
+
+Islands are foundational to Jazira-JS’s page and feature architecture. They localize logic, manage widget lifecycles, and encapsulate streams and subscriptions cleanly — keeping the app modular, reactive, and easy to scale.

@@ -1,0 +1,162 @@
+**Jazira-JS: Stream Class Usage Guide**
+
+The `Stream` class is the core reactive primitive in Jazira-JS. It provides a lightweight, powerful, and extensible mechanism for handling state, reactivity, and asynchronous updates in widgets and islands.
+
+---
+
+### 🔰 Basics
+
+```js
+const myStream = new Stream(initialValue, debounceDelay);
+```
+
+* **initialValue** *(optional)*: The initial value of the stream.
+* **debounceDelay** *(optional)*: Number of milliseconds to delay notifications (default: `0`).
+
+---
+
+### 📥 Setting and Getting Values
+
+```js
+myStream.set(value); // Updates the stream and notifies subscribers
+const current = myStream.get(); // Gets the current stream value
+```
+
+---
+
+### 📡 Subscribing
+
+```js
+const unsubscribe = myStream.subscribe(value => {
+  console.log('Stream value updated:', value);
+});
+```
+
+* `subscribe()` immediately invokes the callback with the current value.
+* `unsubscribe()` removes the callback from notification.
+
+### 🔁 One-time Subscription
+
+```js
+myStream.subscribeOnce(value => {
+  console.log('Only once:', value);
+});
+```
+
+---
+
+### ⏳ Debouncing
+
+Delays notifications until the value has stopped changing for the given debounce period.
+
+```js
+const stream = new Stream(null, 500); // 500ms debounce
+stream.set('A');
+stream.set('B'); // Only 'B' is sent after 500ms
+```
+
+---
+
+### 📦 Batching Updates
+
+```js
+stream.beginBatch();
+stream.set('X');
+stream.set('Y');
+stream.endBatch(); // Only notifies once with 'Y'
+```
+
+* Reduces redundant notifications during rapid updates.
+
+---
+
+### 🚨 Error Handling
+
+```js
+stream.emitError('Something went wrong');
+```
+
+* Notifies all subscribers with the error value.
+
+---
+
+### ✅ Completion
+
+```js
+stream.completeStream();
+```
+
+* Marks the stream as complete; no further notifications.
+
+---
+
+### 🔀 Stream Composition
+
+#### `map()`
+
+```js
+const doubled = myStream.map(val => val * 2);
+```
+
+#### `filter()`
+
+```js
+const evens = myStream.filter(val => val % 2 === 0);
+```
+
+#### `merge()`
+
+```js
+const merged = Stream.merge(streamA, streamB);
+```
+
+* Emits any value from any input stream.
+
+---
+
+### 🧩 Widget Integration
+
+#### Observing a Stream in a Widget
+
+```js
+observeStream(myStream, this, function(value) {
+  this.render(value);
+});
+```
+
+* Automatically tracks subscriptions.
+
+#### Cleaning Up a Widget
+
+```js
+cleanupWidget(this); // Call when widget is destroyed
+```
+
+* Unsubscribes from all tracked streams.
+
+---
+
+### 🌊 Use Cases
+
+* Live data updates (WebSocket-fed streams)
+* UI control flow (form changes, theme switches)
+* Inter-widget communication
+* Debounced user input (search, typing)
+
+---
+
+### 🛠 Best Practices
+
+* Use `filter()` to avoid reacting to unwanted values.
+* Use `map()` to transform data for rendering.
+* Wrap subscriptions in `observeStream()` to enable automatic cleanup.
+* Always call `cleanupWidget()` when a widget is removed.
+* Use `merge()` to react to multiple event sources in a unified way.
+
+---
+
+### 📘 Summary
+
+The `Stream` class makes reactivity simple yet powerful in Jazira-JS. With debouncing, merging, mapping, filtering, batching, and auto-cleanup, it forms the foundation of all dynamic behavior in your widget and island logic.
+
+Start with streams — and build islands that move with data.

@@ -1,0 +1,106 @@
+**Jazira-JS: Widget Class Usage Guide**
+
+The `Widget` class is the foundation for building reusable, reactive, and themeable UI components in Jazira-JS. Each widget is self-contained and designed to plug into an `Island`, handle stream observation, and manage its own DOM.
+
+---
+
+### 🧱 Structure
+
+Each widget includes:
+
+* An `id` for unique identification
+* A `root` DOM element
+* A reference to its `parentElement` and optional `island`
+* Internal `_subscriptions` array for auto-cleanup
+* Optional `state` object for local use
+
+---
+
+### ⚙️ Creating a Widget
+
+```js
+const myWidget = new Widget('greetingBox', document.getElementById('container'));
+```
+
+This creates a new `<div>` element with class `widget` inside the target container.
+
+---
+
+### 🌊 Stream Observation
+
+Use `observe()` to reactively subscribe to streams:
+
+```js
+myWidget.observe(nameStream, function(name) {
+  this.setHTML(`Hello, ${name}`);
+});
+```
+
+Subscriptions are tracked and auto-cleaned on destroy.
+
+---
+
+### 🎨 UI Sugar Helpers
+
+#### Update Content:
+
+```js
+widget.setHTML('<strong>Ready</strong>');
+```
+
+#### Add/Remove Classes:
+
+```js
+widget.addClass('highlight');
+widget.removeClass('disabled');
+```
+
+#### Toggle Visibility:
+
+```js
+widget.show();
+widget.hide();
+```
+
+---
+
+### 🧩 Lifecycle Hooks
+
+#### `attach(island)`
+
+Called when the island registers the widget:
+
+```js
+widget.attach(island);
+```
+
+#### `init()`
+
+Optional setup logic, called by island's `initialize()`.
+
+#### `onActivate()` / `onDeactivate()`
+
+Automatically called when the island is activated or deactivated.
+
+#### `destroy()`
+
+Cleans up subscriptions and removes the root element from the DOM:
+
+```js
+widget.destroy();
+```
+
+---
+
+### 🛠 Best Practices
+
+* Use `observe()` instead of raw stream.subscribe()
+* Keep UI logic and rendering inside `setHTML()` or custom render methods
+* Use theme helpers inside `init()` if needed
+* Always let the island handle widget lifecycle
+
+---
+
+### 📘 Summary
+
+Widgets in Jazira-JS are modular, reactive building blocks that automatically integrate with islands, handle subscriptions gracefully, and provide clean lifecycle hooks and styling sugar. They simplify development while remaining flexible for advanced behaviors.

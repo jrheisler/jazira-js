@@ -1,0 +1,92 @@
+**Jazira-JS: Theme Class Usage Guide**
+
+The `Theme` class in Jazira-JS centralizes the visual styling of widgets and islands. It enables consistent UI theming through named color palettes, built-in spacing, font management, and DOM-level styling — all without requiring CSS knowledge from the developer.
+
+---
+
+### 🎨 Palettes
+
+Palettes are named color sets that control all visual styling. Available palettes include:
+
+* `aurora` (default)
+* `desert`
+* `horizon`
+
+Each palette defines:
+
+* `background`
+* `foreground`
+* `primary`
+* `secondary`
+* `accent`
+* `danger`
+
+---
+
+### 🚀 Usage
+
+#### Apply global styles:
+
+```js
+const theme = new Theme();
+theme.applyGlobalStyles();
+```
+
+#### Switch active palette:
+
+```js
+theme.switchPalette('desert');
+```
+
+This updates all global styles to use the new palette.
+
+---
+
+### 🧩 Styling Elements
+
+Use `styleElement()` to apply widget-specific styles:
+
+```js
+theme.styleElement(myElement);
+```
+
+Optionally use a specific palette:
+
+```js
+theme.styleElement(myElement, {}, 'horizon');
+```
+
+Or override any style inline:
+
+```js
+theme.styleElement(myElement, { backgroundColor: '#FF0000' });
+```
+
+---
+
+### 📦 Defaults
+
+#### Spacing
+
+```js
+theme.spacing.padding; // '10px'
+theme.spacing.margin;  // '8px'
+```
+
+#### Fonts
+
+```js
+theme.fonts.base;      // 'system-ui, sans-serif'
+theme.fonts.monospace; // 'monospace'
+```
+
+---
+
+### 📘 Summary
+
+* Switch themes with `switchPalette()`
+* Auto-style DOM elements with `styleElement()`
+* Global styles apply automatically
+* No CSS authoring required by developers
+
+With Jazira-JS theming, the look and feel of your application remains clean, consistent, and designer-friendly — all from JavaScript.

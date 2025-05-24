@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jazira-JS Sample Island</title>
+
+  <!-- Jazira Core -->
+  <script src="js/stream.js" defer></script>
+  <script src="js/theme.js" defer></script>
+  <script src="js/widget.js" defer></script>
+  <script src="js/stateful_widget.js" defer></script>
+  <script src="js/island.js" defer></script>
+  <script src="js/IslandManager.js" defer></script>
+
+  <!-- Widgets -->
+  <script src="js/button/ButtonWidget.js" defer></script>
+  <script src="js/button/ConfirmButton.js" defer></script>
+  <script src="js/button/CountButton.js" defer></script>
+  <script src="js/text/TextWidget.js" defer></script>
+  <script src="js/text/ReactiveTextWidget.js" defer></script>
+  <script src="js/text/EditTextWidget.js" defer></script>
+
+  <!-- Layout -->
+  <script src="js/layout/LayoutWidget.js" defer></script>
+  <script src="js/layout/NavBarWidget.js" defer></script>
+
+  <!-- common -->
+  <script src="js/common/SelectorWidget.js" defer></script>
+  <script src="js/common/HeaderWidget.js" defer></script>
+  <script src="js/common/HorizontalRuleWidget.js" defer></script>
+  <script src="js/common/EditDataWidget.js" defer></script>
+  <script src="js/common/BrowseDataWidget.js" defer></script>
+  <script src="js/common/DialogIsland.js" defer></script>
+
+  <!-- islands -->
+  <script src="js/islands/homeIsland.js" defer></script>
+  <script src="js/islands/profileIsland.js" defer></script>
+  
+
+  <!-- App -->
+  <script src="app.js" defer></script>
+
+  <style>
+    body {
+      padding: 2rem;
+      font-family: system-ui, sans-serif;
+    }
+
+    #navBar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    #navBar button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Island Roots -->
+  <div id="headerBar"></div>
+     <div id="homeRoot" class="island-root"></div>
+    <div id="profileRoot" class="island-root"></div>
+</body>
+</html>

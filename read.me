@@ -1,0 +1,290 @@
+# Jazira-JS Design Overview
+
+This document outlines the core architecture, class hierarchy, and reactive design strategy for the Jazira-JS micro framework.
+
+---
+
+## 🔧 Core Principles
+
+* **Composable UI** built from modular `Widget` classes
+* **Theming** driven by palette-based visual identity
+* **Streams** power reactive state and system-wide updates
+* **Islands** encapsulate logical units of interactivity
+* **Sugar** simplifies developer ergonomics without restricting flexibility
+
+---
+
+## 🧱 Class Hierarchy
+
+```text
+Widget (Base)
+├── StatefulWidget
+│   ├── ButtonWidget
+│   │   ├── ConfirmButton
+│   │   └── CountButton
+│   └── ReactiveTextWidget
+└── TextWidget
+
+Island
+
+Theme (Singleton)
+Stream
+```
+
+### Visual Diagram
+
+```mermaid
+graph TD
+  Widget --> StatefulWidget
+  Widget --> TextWidget
+  StatefulWidget --> ButtonWidget
+  StatefulWidget --> ReactiveTextWidget
+  ButtonWidget --> ConfirmButton
+  ButtonWidget --> CountButton
+  Island
+  Theme
+  Stream
+```
+
+---
+
+## 📦 Class Summaries
+
+### Widget
+
+* Base class for all renderable UI components
+* Manages DOM root, stream subscriptions, and lifecycle
+* Supports global theming via `theme.styleElement()`
+
+### StatefulWidget (extends Widget)
+
+* Adds internal `state` stream
+* Supports `setState()` and `onStateChange()`
+* Automatically re-renders on theme change
+
+### TextWidget
+
+* Lightweight stateless widget for styled text
+* Sugar options: `tag`, `size`, `weight`, `italic`, `align`, etc.
+
+### ReactiveTextWidget (extends StatefulWidget)
+
+* Uses internal state to update text dynamically
+* Fully reactive to both state and theme changes
+
+### ButtonWidget (extends StatefulWidget)
+
+* Renders a button based on label in state
+* Designed to be subclassed for behavior changes
+
+### ConfirmButton / CountButton
+
+* Extend `ButtonWidget`
+* Provide specific behaviors via `handleClick()` overrides
+
+---
+
+## 🏝️ Island
+
+* Logical container that holds and coordinates widgets
+* Tracks stream subscriptions
+* Owns lifecycle: `initialize()`, `activate()`, `deactivate()`, `destroy()`
+
+---
+
+## 🎨 Theme
+
+* Singleton `theme` instance
+* Holds palette definitions (`aurora`, `desert`, `horizon`)
+* Provides `applyGlobalStyles()` and `styleElement()`
+* Reactive: emits `themeChanged` stream
+
+---
+
+## 🔁 Stream
+
+* Lightweight pub/sub system for reactivity
+* Used for state, theme, and custom signals
+* Supports: `subscribe()`, `set()`, `get()`, `unsubscribe()`
+
+---
+
+## ✅ System Highlights
+
+* Declarative: widget structure is composable
+* Reactive: stream-based state and theme changes
+* Themeable: palettes apply globally and locally
+* Scalable: islands modularize app logic
+* Sweet: developer-friendly syntax with minimal boilerplate
+
+---
+
+## 🧭 Next Steps
+
+* Add support for layouts (rows, columns, grids)
+* Add routing for multi-island navigation
+* Build a demo palette switcher + component showcase page
+* Introduce markdown-style text sugar
+* Export widgets as self-registering modules
+
+---
+
+> Jazira-JS is built to be small, sweet, and sharp — like a desert flower thriving under the sun of design clarity 🌵✨
+
+
+Update:
+
+
+
+
+✅ Your **Jazira-JS Design Overview** document has been updated to reflect the latest architectural additions:
+
+---
+
+## 🧱 Updated Class Hierarchy
+
+```text
+Widget (Base)
+├── StatefulWidget
+│   ├── ButtonWidget
+│   │   ├── ConfirmButton
+│   │   └── CountButton
+│   ├── ReactiveTextWidget
+│   └── LayoutWidget
+│       ├── Row (factory)
+│       └── Column (factory)
+└── TextWidget
+
+Island
+
+Theme (Singleton)
+Stream
+```
+
+### Visual Diagram
+
+```mermaid
+graph TD
+  Widget --> StatefulWidget
+  Widget --> TextWidget
+  StatefulWidget --> ButtonWidget
+  StatefulWidget --> ReactiveTextWidget
+  StatefulWidget --> LayoutWidget
+  LayoutWidget --> Row
+  LayoutWidget --> Column
+  ButtonWidget --> ConfirmButton
+  ButtonWidget --> CountButton
+  Island
+  Theme
+  Stream
+```
+
+---
+
+## 📦 New Class Summaries
+
+### LayoutWidget (extends Widget)
+
+* Provides flexbox-based layout container
+* Accepts sugar props: `direction`, `gap`, `align`, `justify`, `wrap`, `padding`, `palette`
+* Methods:
+
+  * `addWidget(widget)` — appends children
+* Uses `theme.styleElement()` for appearance and auto-updates with `themeChanged`
+
+### Row / Column (factories)
+
+* Lightweight wrappers over `LayoutWidget`
+* Automatically set `direction: 'row'` or `'column'`
+* `wrap: true` by default to prevent layout overflow
+* Ideal for stacking or flowing child widgets
+
+---
+
+## ✅ Additional Highlights
+
+* Layouts are composable — rows inside columns, and vice versa
+* Reactive text and buttons now restyle live when the theme changes
+* Layouts respond cleanly to screen width (via flex-wrap)
+
+---
+
+
+📝 Developer Note: Inputs Emit, Texts Receive
+In Jazira-JS, inputs are emitters and display widgets (like ReactiveTextWidget) are receivers. This is a guiding principle that helps enforce one-way data flow and avoids complex entanglement.
+
+⚙️ Design Philosophy
+Inputs (like EditTextWidget) are sources of truth
+→ They emit user changes via onChange streams.
+
+Textual displays (like ReactiveTextWidget) are observers
+→ They subscribe to state streams and update their view.
+
+✋ Why We Don’t Support Shared Inputs
+Two inputs controlling the same stream causes:
+
+Race conditions
+
+Feedback loops
+
+Hidden state conflicts
+
+It violates one-directional flow and burdens the framework with edge-case logic.
+
+✅ What You Can Do Instead
+Let one input emit to a shared stream.
+
+Let many outputs receive and display that stream.
+
+If two inputs must be synced, handle that in app-level logic with identity tags and guards.
+
+js
+Copy
+Edit
+edit1.onChange.subscribe(value => {
+  sharedStream.set({ from: 'edit1', value });
+});
+
+sharedStream.subscribe(({ from, value }) => {
+  if (from !== 'edit2') {
+    edit2.setValue(value); // only update if not self-originated
+  }
+});
+📌 Summary
+Widget Type	Role	Flow Direction
+EditTextWidget	Emits values	Out → Stream
+ReactiveTextWidget	Receives	Stream → Display
+SelectorWidget	Emits values	Out → Stream
+NavBarWidget	Emits nav	Out → Stream
+
+✨ This pattern keeps Jazira small, sweet, and safe — exactly as intended.
+
+
+
+
+
+
+Absolutely! Here's a concise **prompt snippet** you can reuse in the future to remind both yourself and me how to correctly use and reason about the `Island` class with reactive state via a `Proxy`.
+
+---
+
+### ✅ **Reusable Prompt: Reactive Island Architecture in Jazira-JS**
+
+ In this app, each `Island` is a reactive container backed by a JavaScript `Proxy`. When I assign a value like `island.name = 'Jeff'`, it stores the value in an internal reactive state object and notifies any subscribers. I can subscribe using `island.onChange('name', handler)`.
+
+ This makes each property (like `name`, `role`, etc.) behave as a reactive signal, and I can bind them to UI widgets (like `TextWidget`, `EditTextWidget`, etc.) to reflect changes automatically.
+
+ Please ensure all `Island` state assignments and usage follow this pattern:
+
+ * Assign directly via `island.key = value`
+ * Read via `island.key`
+ * Subscribe via `island.onChange('key', handler)`
+
+ Also, use `island.createReactiveObject(json)` when working with dynamic objects that need per-field reactivity (e.g. for form records). These returned objects expose `.onChange(key, handler)` and will sync with `EditTextWidget` or other UI components.
+
+---
+
+### 🧠 Bonus Short Version (for inline use):
+
+ This app uses a reactive `Island` class wrapped in a `Proxy`. Assignments like `island.name = 'Jeff'` trigger reactivity and notify subscribers via `island.onChange('name', fn)`. All state is auto-tracked and can be bound to widgets for live updates. Use `createReactiveObject()` for per-field reactive forms.
+
